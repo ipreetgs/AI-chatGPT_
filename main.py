@@ -4,13 +4,10 @@ import datetime
 import openai
 import os
 
-# STATIC_URL = '/static/'
-# STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'), ]
-# STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static")
+# openai.api_key = os.environ["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"]
+# openai.api_key = "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"
+openai.api_key = ""
 
-# openai.api_key = "sk-**********"
-#openai.api_key_path='apikey'
-openai.api_key_path = '/Apikey.txt'
 
 app = Flask(__name__)
 app.config["Debug"] = True
