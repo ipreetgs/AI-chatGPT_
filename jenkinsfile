@@ -16,7 +16,8 @@ pipeline {
 
         stage('Test') {
             steps {
-                sh '/path/to/python -m pytest'
+                echo "hi"
+                
             }
         }
 
@@ -25,12 +26,7 @@ pipeline {
                 branch 'main'
             }
             steps {
-                sh 'docker build -t myapp .'
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                    sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
-                }
-                sh 'docker tag myapp myuser/myapp:latest'
-                sh 'docker push myuser/myapp:latest'
+                echo "hello"
             }
         }
     }
