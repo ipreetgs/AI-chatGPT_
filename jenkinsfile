@@ -16,19 +16,21 @@ pipeline {
         }
         }
 
-        stage('Test') {
+        stage('remove old build') {
             steps {
                 echo "hi"
+                sh ' docker ps --filter "ancestor=finalflaskapp" --all --quiet'
+                sh 'docker stop $( docker ps --filter "ancestor=finalflaskapp" --all --quiet)'
+                sh 'docker rm $( docker ps --filter "ancestor=finalflaskapp" --all --quiet)'
+                
                 
             }
         }
 
         stage('Deploy') {
-            when {
-                branch 'main'
-            }
             steps {
                 echo "hello"
+                sh 'docker run -it -d -p 8888:8888 finalflaskapp'
             }
         }
     }
