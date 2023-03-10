@@ -11,7 +11,7 @@ pipeline {
         stage('CREDS') {
             steps {
                 withCredentials([string(credentialsId: 'Api_openAI', variable: 'API_KEY')]) {
-                sh 'docker build --build-arg API_KEY=API_KEY -t FinalFlaskApp .'
+                sh 'docker build --build-arg API_KEY=API_KEY -t finalflaskApp .'
                 }
         }
         }
