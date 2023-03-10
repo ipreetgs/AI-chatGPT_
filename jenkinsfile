@@ -8,9 +8,12 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage('CREDS') {
             steps {
-                sh 'pip install -r requirements.txt'
+                withCredentials([string(credentialsId: 'Api_openAI', variable: 'API_KEY')]) 
+        {
+            {
+                sh 'docker build --build-arg API_KEY=your_api_key -t FinalFlaskApp .'
             }
         }
 

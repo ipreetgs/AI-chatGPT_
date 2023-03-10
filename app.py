@@ -10,7 +10,11 @@ import os
 
 # openai.api_key = "sk-**********"
 #openai.api_key_path='apikey'
-openai.api_key_path = '/Apikey.txt'
+openai.api_key=os.environ.get('API_KEY')
+if not api_key:
+    raise ValueError('API_KEY environment variable is not set')
+
+# openai.api_key_path = '/Apikey.txt'
 
 app = Flask(__name__)
 app.config["Debug"] = True
