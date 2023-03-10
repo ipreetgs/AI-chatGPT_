@@ -10,7 +10,7 @@ import os
 
 # openai.api_key = "sk-**********"
 #openai.api_key_path='apikey'
-openai.api_key=os.environ.get('API_KEY')
+openai.api_key=os.environ.get('OPENAI_API_KEY')
 if not openai.api_key:
     raise ValueError('API_KEY environment variable is not set')
 
