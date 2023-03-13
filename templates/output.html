@@ -1,11 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <link rel="icon"  href="static/favicon.ico"/>
     <meta charset="utf-8">
-    <title>Output</title>
+    <title>output Generated here.</title>
+    <style>
+        .output-box {
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 20px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+    </style>
 </head>
 <body>
-    <h1>Generated Program:</h1>
-    <pre>{{ program }}</pre>
+    <h1>output is :</h1>
+    <div class="output-box">{{ program }}</div>
 </body>
 </html>
