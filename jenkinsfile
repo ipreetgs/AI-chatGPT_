@@ -20,8 +20,9 @@ pipeline {
             steps {
                 echo "hi"
                 sh ' docker ps --filter "ancestor=finalflaskapp" --all --quiet'
-                sh 'docker stop $(docker ps --filter "ancestor=finalflaskapp" --all --quiet)'
-                sh 'docker rm $(docker ps --filter "ancestor=finalflaskapp" --all --quiet)'
+                def output = sh(returnStdout: true, script: 'docker ps --filter "ancestor=finalflaskapp" --all --quiet')
+                sh 'docker stop $output'
+                sh 'docker rm $output'
                 
                 
             }
