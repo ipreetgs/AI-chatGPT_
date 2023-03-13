@@ -23,8 +23,8 @@ pipeline {
                 // sh ' docker ps --filter "ancestor=finalflaskapp" --all --quiet'
                 def output = sh(returnStdout: true, script: 'docker ps --filter "ancestor=finalflaskapp" --all --quiet')
                 echo "The output of the command is: ${output}"
-                sh 'docker kill ${output}'
-                sh 'docker rm ${output}'
+                sh "docker kill ${output.trim().split('\\n').join(' ')}"
+                sh "docker rm ${output.trim().split('\\n').join(' ')}"
                 }
                 
                 
