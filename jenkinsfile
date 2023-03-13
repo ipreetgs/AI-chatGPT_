@@ -35,7 +35,7 @@ pipeline {
             steps {
                 echo "hello"
                 // sh 'docker run -it -d -p 8888:8888 finalflaskapp'
-                 sh 'docker run -p 8888:8881 -e OPENAI_API_KEY="${OPENAI_API_KEY}" finalflaskapp:latest'
+                 sh 'docker run -p 8881:8888 -e OPENAI_API_KEY="${OPENAI_API_KEY}" finalflaskapp:latest'
             }
         }
     }
