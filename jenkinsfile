@@ -18,11 +18,13 @@ pipeline {
 
         stage('remove old build') {
             steps {
+                script {
                 echo "hi"
                 sh ' docker ps --filter "ancestor=finalflaskapp" --all --quiet'
                 def output = sh(returnStdout: true, script: 'docker ps --filter "ancestor=finalflaskapp" --all --quiet')
                 sh 'docker stop $output'
                 sh 'docker rm $output'
+                }
                 
                 
             }
