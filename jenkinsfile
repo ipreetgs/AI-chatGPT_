@@ -27,12 +27,12 @@ node {
     stage('Push image') {
         
         docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
-            app.push("${env.BUILD_NUMBER}")
+            app.push
         }
      }
-    stage('deploy'){
-        sh 'docker run -it -d -p 8888:8888 -e OPENAI_API_KEY="${OPENAI_API_KEY}" manishaverma/deployrepo:latest'
-    }
+    //stage('deploy'){
+    //    sh 'docker run -it -d -p 8888:8888 -e OPENAI_API_KEY="${OPENAI_API_KEY}" manishaverma/deployrepo:latest'
+    //}
     stage('Trigger ManifestUpdate') {
                 echo "triggering manifestupdate"
                 build job: 'manifestupdate', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
