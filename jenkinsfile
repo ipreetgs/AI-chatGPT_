@@ -1,43 +1,54 @@
-node {
-    def app
+pipeline {
+    agent any
 
-    stage('Clone repository') {
-      
+    stages {
+        stage('Clone repository') {
+            steps {
+                checkout scm
+            }
+        }
 
-        checkout scm
-    }
-    
+        stage('Build image') {
+            steps {
+                script {
+                    def app = docker.build("manishaverma/deployrepo")
+                }
+            }
+        }
 
-    stage('Build image') {
-        
-  
-       app = docker.build("manishaverma/deployrepo")
-    }
-    
+        stage('Test image') {
+            steps {
+                script {
+                    app.inside {
+                        sh 'echo "Tests passed"'
+                    }
+                }
+            }
+        }
 
+        stage('Push image') {
+            steps {
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
+                        app.push("${env.BUILD_NUMBER}")
+                    }
+                }
+            }
+        }
 
-    stage('Test image') {
-  
+        stage('Deploy') {
+            steps {
+                sh 'docker run -it -d -p 8888:8888 -e OPENAI_API_KEY="${OPENAI_API_KEY}" manishaverma/deployrepo:latest'
+            }
+        }
 
-        app.inside {
-            sh 'echo "Tests passed"'
+        stage('Trigger manifest update') {
+            steps {
+                script {
+                    echo "Triggering manifest update"
+                    build job: 'manifestupdate', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
+                }
+            }
         }
     }
-
-    stage('Push image') {
-        
-        docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
-            app.push("${env.BUILD_NUMBER}")
-        }
-     }
-    stage('deploy'){
-        sh 'docker run -it -d -p 8888:8888 -e OPENAI_API_KEY="${OPENAI_API_KEY}" manishaverma/deployrepo:latest'
-    }
- stage('Trigger manifestupdate') {
-        steps {
-                echo "triggering manifestupdate"
-                build job: 'manifestupdate', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
-        }
-     }
-
 }
