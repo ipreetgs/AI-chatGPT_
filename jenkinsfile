@@ -33,16 +33,9 @@ node {
     stage('deploy'){
         sh 'docker run -it -d -p 8888:8888 -e OPENAI_API_KEY="${OPENAI_API_KEY}" manishaverma/deployrepo:latest'
     }
-    stage('Trigger other pipeline') {
-            steps {
-                build job: 'manifestupdate', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
-            }
-        }
- stage('Trigger manifestupdate') {
-        steps {
+    stage('Trigger ManifestUpdate') {
                 echo "triggering manifestupdate"
-                build job: 'manifestupdate', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
+                build job: 'updatemanifest', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
         }
-     }
 
 }
