@@ -11,7 +11,7 @@ node {
     stage('Build image') {
         
   
-       app = docker.build("manishaverma/secondinnovation")
+       app = docker.build("manishaverma/deployrepo")
     }
     
 
@@ -31,7 +31,7 @@ node {
         }
      }
     //stage('deploy'){
-    //    sh 'docker run -it -d -p 8888:8888 -e OPENAI_API_KEY="${OPENAI_API_KEY}" manishaverma/secondinnovation:latest'
+    //    sh 'docker run -it -d -p 8888:8888 -e OPENAI_API_KEY="${OPENAI_API_KEY}" manishaverma/deployrepo:latest'
     //}
     stage('Trigger ManifestUpdate') {
                 echo "triggering manifestupdate"
