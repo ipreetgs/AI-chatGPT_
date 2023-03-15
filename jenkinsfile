@@ -6,11 +6,15 @@ node {
 
         checkout scm
     }
+    
 
     stage('Build image') {
+        
   
-       app = docker.build("manishaverma/javaimg")
+       app = docker.build("manishaverma/deployrepo")
     }
+    
+
 
     stage('Test image') {
   
@@ -25,9 +29,12 @@ node {
         docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
             app.push("${env.BUILD_NUMBER}")
         }
-    }
-     stage('Trigger ManifestUpdate') {
-                echo "triggering manifestupdatejob"
+     }
+    //stage('deploy'){
+    //    sh 'docker run -it -d -p 8888:8888 -e OPENAI_API_KEY="${OPENAI_API_KEY}" manishaverma/deployrepo:latest'
+    //}
+    stage('Trigger ManifestUpdate') {
+                echo "triggering manifestupdate"
                 build job: 'manifestupdate', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
         }
 
