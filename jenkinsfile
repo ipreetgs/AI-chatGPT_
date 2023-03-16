@@ -1,21 +1,46 @@
 pipeline {
+    agent any
+
+     environment {
+        ECR_REGISTRY = '269001393029.dkr.ecr.us-east-1.amazonaws.com/pythonflask'
+        ECR_REPO = 'pythonflask'
+        AWS_REGION = 'us-east-1'
+        DOCKER_IMAGE_NAME = 'ekfinalflaskapp'
+        DOCKERFILE_PATH = '.'
+    }
     
+
     stages {
-        stage('Build and Push Image') {
+        stage('Checkout') {
             steps {
-                sh 'docker build -t my-image:latest .'
+                checkout scm
+            }
+        }
+
+        stage('CREDS') {
+            steps {
+                withCredentials([string(credentialsId: 'Api_openAI', variable: 'API_KEY')]) {
+                sh 'docker build --build-arg API_KEY=API_KEY -t my-image .'
+                }
+        }
+        }
+
+         stage('Build and Push Image') {
+            steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                     sh 'docker tag my-image:latest 269001393029.dkr.ecr.us-east-1.amazonaws.com/my-image:latest'
                     sh 'docker push 269001393029.dkr.ecr.us-east-1.amazonaws.com/my-image:latest'
                 }
             }
         }
-        stage('Deploy to Kubernetes') {
+
+        stage('Deploy') {
             steps {
-                withKubeConfig([credentialsId: 'KUBECONFIG_FILE', serverUrl: 'https://<KUBERNETES_MASTER_IP>:<KUBERNETES_MASTER_PORT>']) {
-                    sh 'kubectl apply -f deployment.yaml'
-                }
+                echo "hello"
+                // sh 'docker run -it -d -p 8888:8888 finalflaskapp'
+                 sh 'docker run -id -d -p 8881:8888 -e OPENAI_API_KEY="${OPENAI_API_KEY}" finalflaskapp:latest'
             }
         }
     }
 }
+
