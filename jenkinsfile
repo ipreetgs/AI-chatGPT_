@@ -1,49 +1,37 @@
 pipeline {
-    agent any
-
-     environment {
-        ECR_REGISTRY = '269001393029.dkr.ecr.us-east-1.amazonaws.com/pythonflask'
-        ECR_REPO = 'pythonflask'
-        AWS_REGION = 'us-east-1'
-        DOCKER_IMAGE_NAME = 'pythonflask'
-        DOCKERFILE_PATH = '.'
+    agent {
+        kubernetes {
+            defaultContainer 'jnlp'
+            yaml """
+            apiVersion: v1
+            kind: Pod
+            metadata:
+              labels:
+                app: jenkins
+            spec:
+              containers:
+              - name: jnlp
+                image: jenkins/jnlp-slave:latest
+                tty: true
+              restartPolicy: Never
+            """
+        }
     }
-    
-
     stages {
-        stage('Checkout') {
+        stage('Build and Push Image') {
             steps {
-                checkout scm
+                sh 'docker build -t my-image:latest .'
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+                    sh 'docker tag my-image:latest 269001393029.dkr.ecr.us-east-1.amazonaws.com/my-image:latest'
+                    sh 'docker push 269001393029.dkr.ecr.us-east-1.amazonaws.com/my-image:latest'
+                }
             }
         }
-
-        stage('CREDS') {
+        stage('Deploy to Kubernetes') {
             steps {
-                withCredentials([string(credentialsId: 'Api_openAI', variable: 'API_KEY')]) {
-                sh 'docker build --build-arg API_KEY=API_KEY -t pythonflask .'
+                withKubeConfig([credentialsId: 'KUBECONFIG_FILE', serverUrl: 'https://<KUBERNETES_MASTER_IP>:<KUBERNETES_MASTER_PORT>']) {
+                    sh 'kubectl apply -f deployment.yaml'
                 }
-        }
-        }
-
-        stage('Push image to ECR') {
-                    steps {
-                        script {
-                            withCredentials([awsEcr(serverUrl: "https://${ECR_REGISTRY}", region: "${AWS_REGION}", credentialsId: "aws-ecr-creds")]) {
-                                docker.withRegistry("https://${ECR_REGISTRY}", 'ecr') {
-                                    def ecrImage = docker.image("${DOCKER_IMAGE_NAME}")
-                                    ecrImage.push("${ECR_REPO}:${env.BUILD_NUMBER}")
-                                    ecrImage.push("${ECR_REPO}:latest")
-                                }
-                            }
-                        }
-                    }
-        }
-
-        stage('Deploy') {
-            steps {
-                echo "hello"
-                // sh 'docker run -it -d -p 8888:8888 finalflaskapp'
-                 sh 'docker run -id -d -p 8881:8888 -e OPENAI_API_KEY="${OPENAI_API_KEY}" finalflaskapp:latest'
             }
         }
     }
