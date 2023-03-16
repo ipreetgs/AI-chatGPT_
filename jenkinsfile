@@ -24,10 +24,19 @@ node {
         }
     }
 
-    stage('Push image') {
-        
-        docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
-            app.push("${env.BUILD_NUMBER}")
+stage('Push image to ECR') {
+            steps {
+                script {
+                    withCredentials([awsEcr(serverUrl: "https://${ECR_REGISTRY}", region: "${AWS_REGION}", credentialsId: "aws-ecr-creds")]) {
+                        docker.withRegistry("https://${ECR_REGISTRY}", 'ecr') {
+                            def ecrImage = docker.image("pythonflask")
+                            ecrImage.push("${ECR_REPO}:${env.BUILD_NUMBER}")
+                            ecrImage.push("${ECR_REPO}:latest")
+                        }
+                    }
+                }
+            }
+
         }
      }
     //stage('deploy'){
