@@ -5,7 +5,7 @@ pipeline {
         ECR_REGISTRY = '269001393029.dkr.ecr.us-east-1.amazonaws.com/pythonflask'
         ECR_REPO = 'pythonflask'
         AWS_REGION = 'us-east-1'
-        DOCKER_IMAGE_NAME = 'ekfinalflaskapp'
+        DOCKER_IMAGE_NAME = 'pythonflask'
         DOCKERFILE_PATH = '.'
     }
     
@@ -20,7 +20,7 @@ pipeline {
         stage('CREDS') {
             steps {
                 withCredentials([string(credentialsId: 'Api_openAI', variable: 'API_KEY')]) {
-                sh 'docker build --build-arg API_KEY=API_KEY -t ekfinalflaskapp .'
+                sh 'docker build --build-arg API_KEY=API_KEY -t pythonflask .'
                 }
         }
         }
