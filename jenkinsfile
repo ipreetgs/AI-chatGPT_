@@ -1,22 +1,5 @@
 pipeline {
-    agent {
-        kubernetes {
-            defaultContainer 'jnlp'
-            yaml """
-            apiVersion: v1
-            kind: Pod
-            metadata:
-              labels:
-                app: jenkins
-            spec:
-              containers:
-              - name: jnlp
-                image: jenkins/jnlp-slave:latest
-                tty: true
-              restartPolicy: Never
-            """
-        }
-    }
+    
     stages {
         stage('Build and Push Image') {
             steps {
