@@ -27,7 +27,7 @@ pipeline {
 
          stage('Build and Push Image') {
             steps {
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',credentialsId:'aws_cred' accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                     sh 'docker tag my-image:latest 269001393029.dkr.ecr.us-east-1.amazonaws.com/my-image:latest'
                     sh 'docker push 269001393029.dkr.ecr.us-east-1.amazonaws.com/my-image:latest'
                 }
