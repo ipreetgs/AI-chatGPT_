@@ -5,7 +5,7 @@ pipeline {
         ECR_REGISTRY = '269001393029.dkr.ecr.us-east-1.amazonaws.com/pythonflask'
         ECR_REPO = 'pythonflask'
         AWS_REGION = 'us-east-1'
-        DOCKER_IMAGE_NAME = 'ekfinalflaskapp'
+        DOCKER_IMAGE_NAME = 'my-image'
         DOCKERFILE_PATH = '.'
     }
     
@@ -38,7 +38,7 @@ pipeline {
             steps {
                 echo "hello"
                 // sh 'docker run -it -d -p 8888:8888 finalflaskapp'
-                 sh 'docker run -id -d -p 8881:8888 -e OPENAI_API_KEY="${OPENAI_API_KEY}" finalflaskapp:latest'
+                 sh 'docker run -id -d -p 8881:8888 -e OPENAI_API_KEY="${OPENAI_API_KEY}" my-image:latest'
             }
         }
     }
