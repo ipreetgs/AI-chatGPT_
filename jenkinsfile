@@ -1,50 +1,50 @@
-node {
-    def app
+pipeline {
+    agent any
 
-    stage('Clone repository') {
-      
-
-        checkout scm
+     environment {
+        ECR_REGISTRY = '269001393029.dkr.ecr.us-east-1.amazonaws.com/pythonflask'
+        ECR_REPO = 'pythonflask'
+        AWS_REGION = 'us-east-1'
+        DOCKER_IMAGE_NAME = 'ekfinalflaskapp'
+        DOCKERFILE_PATH = '.'
     }
     
 
-    stage('Build image') {
-        
-  
-       app = docker.build("manishaverma/deployrepo")
-    }
-    
-
-
-    stage('Test image') {
-  
-
-        app.inside {
-            sh 'echo "Tests passed"'
-        }
-    }
-
-stage('Push image to ECR') {
+    stages {
+        stage('Checkout') {
             steps {
-                script {
-                    withCredentials([awsEcr(serverUrl: "https://${ECR_REGISTRY}", region: "${AWS_REGION}", credentialsId: "aws-ecr-creds")]) {
-                        docker.withRegistry("https://${ECR_REGISTRY}", 'ecr') {
-                            def ecrImage = docker.image("pythonflask")
-                            ecrImage.push("${ECR_REPO}:${env.BUILD_NUMBER}")
-                            ecrImage.push("${ECR_REPO}:latest")
+                checkout scm
+            }
+        }
+
+        stage('CREDS') {
+            steps {
+                withCredentials([string(credentialsId: 'Api_openAI', variable: 'API_KEY')]) {
+                sh 'docker build --build-arg API_KEY=API_KEY -t ekfinalflaskapp .'
+                }
+        }
+        }
+
+        stage('Push image to ECR') {
+                    steps {
+                        script {
+                            withCredentials([awsEcr(serverUrl: "https://${ECR_REGISTRY}", region: "${AWS_REGION}", credentialsId: "aws-ecr-creds")]) {
+                                docker.withRegistry("https://${ECR_REGISTRY}", 'ecr') {
+                                    def ecrImage = docker.image("${DOCKER_IMAGE_NAME}")
+                                    ecrImage.push("${ECR_REPO}:${env.BUILD_NUMBER}")
+                                    ecrImage.push("${ECR_REPO}:latest")
+                                }
+                            }
                         }
                     }
-                }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo "hello"
+                // sh 'docker run -it -d -p 8888:8888 finalflaskapp'
+                 sh 'docker run -id -d -p 8881:8888 -e OPENAI_API_KEY="${OPENAI_API_KEY}" finalflaskapp:latest'
             }
-
         }
-     }
-    //stage('deploy'){
-    //    sh 'docker run -it -d -p 8888:8888 -e OPENAI_API_KEY="${OPENAI_API_KEY}" manishaverma/deployrepo:latest'
-    //}
-    stage('Trigger ManifestUpdate') {
-                echo "triggering manifestupdate"
-                build job: 'manifestupdate', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
-        }
-
+    }
 }
