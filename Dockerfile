@@ -1,19 +1,15 @@
-# Use an official Python runtime as a parent image
-FROM python:3.9-slim-buster
 
-# Set the working directory to /app
+FROM python:3.9
 WORKDIR /app
-
-# Copy the current directory contents into the container at /app
 COPY . /app
 
 # Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Expose port 5000 for the Flask app to listen on
-EXPOSE 5000
-
-# Define the command to run the Flask app when the container starts
+RUN pip install --trusted-host pypi.python.org -r requirements.txt
+RUN pip install openai
+# Make port 80 available to the world outside this container
+EXPOSE 88
+ENV OPENAI_API_KEY =$API_KEY
 CMD ["python", "app.py"]
+
 
 
