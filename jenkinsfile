@@ -39,5 +39,12 @@ pipeline {
          }
         }
       }
+       stage('Trigger manifestupdate') {
+        steps {
+                echo "triggering manifestupdate"
+                build job: 'manifestupdate', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
+        }
+     }
+
     }
 }
