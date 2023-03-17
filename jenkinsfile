@@ -1,46 +1,32 @@
 pipeline {
     agent any
-
-     environment {
-        ECR_REGISTRY = '269001393029.dkr.ecr.us-east-1.amazonaws.com/pythonflask'
-        ECR_REPO = 'pythonflask'
-        AWS_REGION = 'us-east-1'
-        DOCKER_IMAGE_NAME = 'my-image'
-        DOCKERFILE_PATH = '.'
-    }
     
-
     stages {
-        stage('Checkout') {
+        stage('Build and Push Image to ECR') {
             steps {
-                checkout scm
-            }
-        }
-
-        stage('CREDS') {
-            steps {
-                withCredentials([string(credentialsId: 'Api_openAI', variable: 'API_KEY')]) {
-                sh 'docker build --build-arg API_KEY=API_KEY -t pythonflask .'
-                }
-        }
-        }
-
-         stage('Build and Push Image') {
-            steps {
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',credentialsId:'aws_cred', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                    sh 'docker tag my-image:latest 269001393029.dkr.ecr.us-east-1.amazonaws.com/pythonflask:latest'
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                ]]) {
+                    sh 'aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 269001393029.dkr.ecr.us-east-1.amazonaws.com'
+                    sh 'docker build -t pythonflask:latest .'
+                    sh 'docker tag pythonflask:latest 269001393029.dkr.ecr.us-east-1.amazonaws.com/pythonflask:latest'
                     sh 'docker push 269001393029.dkr.ecr.us-east-1.amazonaws.com/pythonflask:latest'
                 }
             }
         }
-
-        stage('Deploy') {
+        
+        stage('Deploy to EKS') {
             steps {
-                echo "hello"
-                // sh 'docker run -it -d -p 8888:8888 pythonflask'
-                 sh 'docker run -id -d -p 8881:8888 -e OPENAI_API_KEY="${OPENAI_API_KEY}" pythonflask:latest'
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                ]]) {
+                    sh 'kubectl apply -f <deployment_file> --kubeconfig=<kubeconfig_file>'
+                }
             }
         }
     }
 }
-
