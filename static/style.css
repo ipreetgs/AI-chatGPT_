@@ -1,5 +1,5 @@
 body {
-    background-color: #756969;
+    background-color: #574b4b;
   }
   h0{
     position: absolute;
@@ -12,7 +12,7 @@ background: #F6F7FB;
 border-radius: 10px;
   }
  h1{ position: absolute;
-width: 344px;
+width: 400px;
 height: 101px;
 left: 539px;
 bottom: 600px;
@@ -23,21 +23,21 @@ border-radius: 10px;
  h2{
     position: absolute;
 width: 260px;
-height: 58px;
+height: 70px;
 left: 623px;
-top: 90px;
+top: 20px;
 color: #d3d3d3;
 font-family: 'Inter';
 font-style: normal;
 font-weight: 400;
-font-size: 20px;
-line-height: 24px;
+font-size: 22px;
+line-height: 25px;
  }
  h3{
     position: absolute;
 width: 121px;
-height: 45px;
-left: 645px;
+height: 55px;
+left: 670px;
 top: 388px;
 
 background: #415392;
@@ -45,7 +45,7 @@ border-radius: 10px;
  }
  h4{
     position: absolute;
-width: 99px;
+width: 119px;
 height: 38px;
 left: 682px;
 top: 407px;
