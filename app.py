@@ -52,7 +52,8 @@ def output():
     )
     program = response.choices[0].text.strip()
     # return f"You entered: {userInput}"
-    return f"You entered: {program}"
+    # return f"You entered: {program}"
+    return render_template('output.html', program=program)
 
 
 
