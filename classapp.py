@@ -3,9 +3,17 @@ import json
 import datetime
 import openai
 import os
+from models import db
+from models import Program, db
+
+
+
 
 app = Flask(__name__)
 app.config["Debug"] = True
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
+db.init_app(app)
 
 openai.api_key_path='apikey'
 # openai.api_key = os.environ.get('OPENAI_API_KEY')
@@ -36,8 +44,11 @@ class MyFlaskApp(Flask):
             stop=None,
             temperature=0.5,
         )
-        program = response.choices[0].text.strip()
-        return render_template('output.html', program=program)
+        program_text = response.choices[0].text.strip()
+        program = Program(input_text=userInput, output_text=program_text)
+        db.session.add(program)
+        db.session.commit()
+        return render_template('output.html', program=program_text)
 
 if __name__ == '__main__':
     app = MyFlaskApp(__name__)

@@ -10,6 +10,3 @@ RUN pip install openai
 EXPOSE 88
 ENV OPENAI_API_KEY =$API_KEY
 CMD ["python", "app.py"]
-
-
-
